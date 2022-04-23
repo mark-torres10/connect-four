@@ -1,9 +1,9 @@
 """Components needed to create game."""
-from typing import Literal
+from typing import Literal, Tuple
 
 import numpy as np
 
-import constants
+import scripts.constants as constants
 
 
 class Piece:
@@ -29,6 +29,53 @@ class Board:
         self.num_rows = num_rows
         self.num_columns = num_columns
         self.board = np.zeros((self.num_rows, self.num_columns))
+
+    def __getitem__(self, row_col_tuple: Tuple[int, int]):
+        """Provides dunder so that slicing on the board object automatically
+        references the self.board attribute when retrieving items."""
+        try:
+            iter(row_col_tuple)
+        except Exception as e:
+            raise ValueError(
+                f"Need to pass in a iterable for indexing: {e.__repr__()}"
+            )
+
+        row_num, col_num = row_col_tuple
+
+        if not row_num and not col_num:
+            return None
+
+        if isinstance(row_num, int) and row_num > self.num_rows - 1:
+            return None
+        if isinstance(col_num, int) and col_num > self.num_columns - 1:
+            return None
+        
+        return self.board[row_num, col_num]
+
+
+    def __setitem__(self, row_col_tuple: Tuple[int, int], new_value):
+        """Provides dunder so that slicing on the board object automatically
+        references the self.board attribute when setting items.
+
+        Passes in the row and col number as a tuple.
+        """
+        try:
+            iter(row_col_tuple)
+        except Exception as e:
+            raise ValueError(
+                f"Need to pass in a iterable for indexing: {e.__repr__()}"
+            )
+
+        if len(row_col_tuple) != 2:
+            raise IndexError("Need to specify both a row and column.")
+
+        row_num, col_num = row_col_tuple
+        if isinstance(row_num, int) and row_num > self.num_rows - 1:
+            return None
+        if isinstance(col_num, int) and col_num > self.num_columns - 1:
+            return None
+
+        self.board[row_num, col_num] = new_value
 
     def init_board(self):
         """Initialize an empty board."""
