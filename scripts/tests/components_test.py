@@ -29,3 +29,5 @@ class TestBoard:
         board = Board(num_rows=self.num_rows, num_columns=self.num_columns)
         assert board.board.shape == (self.num_rows, self.num_columns)
         assert not np.any(board.board)  # test for all zeros
+        
+    
