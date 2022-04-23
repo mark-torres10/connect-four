@@ -21,9 +21,13 @@ class Piece:
 class Board:
     """Used to define the board that the players are playing on."""
 
-    def __init__(self):
-        self.num_rows = constants.ROW_COUNT
-        self.num_columns = constants.COLUMN_COUNT
+    def __init__(
+        self,
+        num_rows: int = constants.ROW_COUNT,
+        num_columns: int = constants.COLUMN_COUNT
+    ):
+        self.num_rows = num_rows
+        self.num_columns = num_columns
         self.board = np.zeros((self.num_rows, self.num_columns))
 
     def init_board(self):
