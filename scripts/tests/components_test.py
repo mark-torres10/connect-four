@@ -54,7 +54,6 @@ class TestBoard:
         incomplete_column_idx = self.num_columns - 2
 
         base_board[:, full_column_idx] = full_column
-        base_board[:, full_column_idx]
         base_board[:, incomplete_column_idx] = incomplete_column
 
         assert base_board.get_next_valid_row_in_column(full_column_idx) is None
@@ -84,4 +83,66 @@ class TestBoard:
         assert full_board.check_if_any_valid_moves()
 
     def test_check_win_connected_in_a_row(self, base_board):
-        pass
+        """Tests the 'check_win_connected_in_a_row' method."""
+        empty_row = np.zeros(self.num_columns)
+        no_connect_four_row = np.array([1, 2, 0, 1, 2, 0])
+        connect_four_beginning_of_row = np.array([1, 1, 1, 1, 0, 2])
+        connect_four_middle_of_row = np.array([1, 2, 2, 2, 2, 1])
+        connect_four_end_of_row = np.array([1, 0, 2, 2, 2, 2])
+
+        base_board[0, :] = empty_row
+        base_board[1, :] = no_connect_four_row
+        base_board[2, :] = connect_four_beginning_of_row
+        base_board[3, :] = connect_four_middle_of_row
+        base_board[4, :] = connect_four_end_of_row
+
+        assert base_board.check_win_connected_in_a_row(0) is None
+        assert base_board.check_win_connected_in_a_row(1) is None
+        assert base_board.check_win_connected_in_a_row(2) == 1
+        assert base_board.check_win_connected_in_a_row(3) == 2
+        assert base_board.check_win_connected_in_a_row(4) == 2
+        
+    def test_check_win_any_row(self, base_board):
+        """Tests the 'check_win_any_row' method."""
+        # base board, with all zeros, should have None
+        assert base_board.check_win_any_row() is None
+       
+        # board with one row that wins for Player 2
+        new_board = Board()
+        new_board.init_board()
+        connect_four_middle_of_row = np.array([1, 2, 2, 2, 2, 1])
+        new_board[1, :] = connect_four_middle_of_row
+        assert new_board.check_win_any_row() == 2
+        
+
+    def test_check_win_connected_in_a_column(self, base_board):
+        """Tests the 'check_win_connected_in_a_column' method."""
+        empty_column = np.zeros(self.num_rows)
+        no_connect_four_column = np.array([1, 2, 0, 1, 2, 0, 1])
+        connect_four_beginning_of_column = np.array([1, 1, 1, 1, 0, 2, 0])
+        connect_four_middle_of_column = np.array([1, 2, 2, 2, 2, 1, 1])
+        connect_four_end_of_column = np.array([1, 0, 0, 2, 2, 2, 2])
+
+        base_board[:, 0] = empty_column
+        base_board[:, 1] = no_connect_four_column
+        base_board[:, 2] = connect_four_beginning_of_column
+        base_board[:, 3] = connect_four_middle_of_column
+        base_board[:, 4] = connect_four_end_of_column
+
+        assert base_board.check_win_connected_in_a_column(0) is None
+        assert base_board.check_win_connected_in_a_column(1) is None
+        assert base_board.check_win_connected_in_a_column(2) == 1
+        assert base_board.check_win_connected_in_a_column(3) == 2
+        assert base_board.check_win_connected_in_a_column(4) == 2
+
+    def test_check_win_any_column(self, base_board):
+        """Tests the 'check_win_any_column' method."""
+        # base board, with all zeros, should have None
+        assert base_board.check_win_any_column() is None
+       
+        # board with one column that wins for Player 2
+        new_board = Board()
+        new_board.init_board()
+        connect_four_middle_of_column = np.array([1, 2, 2, 2, 2, 1, 1])
+        new_board[:, 1] = connect_four_middle_of_column
+        assert new_board.check_win_any_column() == 2
