@@ -41,9 +41,31 @@ class TestBoard:
         """Tests the 'drop_piece' method."""
         pass
 
-    def test_is_valid_move(self):
+    def test_check_is_move_on_board(self, base_board):
+        """Tests the 'check_is_move_on_board' method."""
+        assert not base_board.check_is_move_on_board(row_num=100, col_num=0)
+        assert not base_board.check_is_move_on_board(row_num=-100, col_num=0)
+        assert not base_board.check_is_move_on_board(row_num=0, col_num=100)
+        assert not base_board.check_is_move_on_board(row_num=0, col_num=-100)
+        assert base_board.check_is_move_on_board(row_num=1, col_num=1)
+
+    def test_is_valid_move(self, base_board):
         """Tests the 'is_valid_move' method."""
-        pass
+        # test 1: move would be onto a space not on the board
+        assert not base_board.is_valid_move(row_num=100, col_num=0)
+
+        # test 2: there is already a nonzero value on that space
+        base_board[1, 1] = 1
+        assert not base_board.is_valid_move(row_num=1, col_num=1)
+
+        # test 3: the move is onto a square whose row isn't the next available
+        # row in a column
+        base_board[0, 3] = 1
+        assert not base_board.is_valid_move(row_num=3, col_num=3)
+
+        # test 4: the move is onto a valid empty square that is the next
+        # available spot (given that [0, 3] is now occupied)
+        assert base_board.is_valid_move(row_num=1, col_num=3)
 
     def test_get_next_valid_row_in_column(self, base_board):
         """Tests the 'get_next_valid_row_in_column' method."""

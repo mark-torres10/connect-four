@@ -105,7 +105,6 @@ class Board:
 
         self.board[[next_valid_row_num, col_num]] = piece.value
 
-    # TODO(mark): add test
     def check_is_move_on_board(self, row_num: int, col_num: int):
         """Given a row_num, col_num pair, check if the move is on the board.
 
@@ -127,7 +126,6 @@ class Board:
 
         return True
 
-    # TODO(mark): add test
     def is_valid_move(self, row_num: int, col_num: int):
         """Checks if a given move is valid."""
         if not self.check_is_move_on_board(row_num=row_num, col_num=col_num):
@@ -159,6 +157,7 @@ class Board:
         for i in range(column.size):
             if column[i] == 0:
                 row_num = i
+                break
 
         return row_num
 
@@ -396,7 +395,6 @@ class Board:
             if not self.check_is_move_on_board(
                 row_num=terminal_row_num, col_num=terminal_col_num
             ):
-                print(f"Unable to find a diagonal in the {direction} direction")  # noqa
                 return None
 
             return np.array([
