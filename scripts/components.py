@@ -690,7 +690,10 @@ class Board:
         for diagonal in list_of_diagonals:
             for row_num, col_num in diagonal:
                 value_at_point = self.board[row_num, col_num]
-                if value_at_point == winner:
+                if winner is None:
+                    winner = value_at_point
+                    num_in_a_row += 1
+                elif value_at_point == winner:
                     num_in_a_row += 1
                 else:
                     num_in_a_row = 0
@@ -749,4 +752,4 @@ class Board:
         # if there is no winner, check if the game is over or if additional
         # moves can still be made. Also return None since neither player has
         # won.
-        return self.check_if_any_valid_moves(), None
+        return not self.check_if_any_valid_moves(), None

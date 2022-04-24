@@ -552,3 +552,76 @@ class TestBoard:
                 ],
             ])
         )
+
+    def test_check_win_connected_in_a_diagonal(self, base_board):
+        """Tests the 'check_win_connected_in_a_diagonal' method."""
+        # test 1: no win on a diagonal. Currently all zeros.
+        assert not base_board.check_win_connected_in_a_diagonal(
+            row_num=0, col_num=4
+        )
+
+        # test 2: no win on a diagonal, nonzeros.
+        base_board[1, 1] = 1
+        base_board[1, 2] = 2
+        base_board[1, 3] = 1
+        base_board[1, 4] = 1
+
+        assert not base_board.check_win_connected_in_a_diagonal(
+            row_num=1, col_num=2
+        )
+
+        # test 3: add winning diagonal starting at [1, 1]
+        base_board[2, 2] = 1
+        base_board[3, 3] = 1
+        base_board[4, 4] = 1
+
+        assert base_board.check_win_connected_in_a_diagonal(
+            row_num=1, col_num=1
+        ) == 1.0
+
+    def test_check_win_any_diagonal(self, base_board):
+        """Tests the 'check_win_any_diagonal' method."""
+        # test 1: no win on a diagonal. Currently all zeros.
+        assert not base_board.check_win_any_diagonal()
+
+        # test 2: no win on a diagonal, nonzeros.
+        base_board[1, 1] = 1
+        base_board[1, 2] = 2
+        base_board[1, 3] = 1
+        base_board[1, 4] = 1
+
+        assert not base_board.check_win_any_diagonal()
+
+        # test 3: add winning diagonal starting at [1, 1]
+        base_board[2, 2] = 1
+        base_board[3, 3] = 1
+        base_board[4, 4] = 1
+
+        assert base_board.check_win_any_diagonal() == 1.0
+
+    def test_is_game_over(self, base_board):
+
+        # test 1: no win. Currently all zeros.
+        has_winner, winner = base_board.is_game_over()
+        assert not has_winner
+        assert winner is None
+
+        # test 2: no win, but some values included.
+        base_board[5, 1] = 1
+        base_board[6, 2] = 2
+        base_board[3, 3] = 1
+        base_board[4, 4] = 1
+
+        has_winner, winner = base_board.is_game_over()
+        assert not has_winner
+        assert winner is None
+
+        # test 3: add values along top row, game over, Player 1 wins.
+        base_board[0, 1] = 1
+        base_board[0, 2] = 1
+        base_board[0, 3] = 1
+        base_board[0, 4] = 1
+
+        has_winner, winner = base_board.is_game_over()
+        assert has_winner
+        assert winner == 1.0
