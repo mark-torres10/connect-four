@@ -101,19 +101,18 @@ class TestBoard:
         assert base_board.check_win_connected_in_a_row(2) == 1
         assert base_board.check_win_connected_in_a_row(3) == 2
         assert base_board.check_win_connected_in_a_row(4) == 2
-        
+
     def test_check_win_any_row(self, base_board):
         """Tests the 'check_win_any_row' method."""
         # base board, with all zeros, should have None
         assert base_board.check_win_any_row() is None
-       
+
         # board with one row that wins for Player 2
         new_board = Board()
         new_board.init_board()
         connect_four_middle_of_row = np.array([1, 2, 2, 2, 2, 1])
         new_board[1, :] = connect_four_middle_of_row
         assert new_board.check_win_any_row() == 2
-        
 
     def test_check_win_connected_in_a_column(self, base_board):
         """Tests the 'check_win_connected_in_a_column' method."""
@@ -139,10 +138,395 @@ class TestBoard:
         """Tests the 'check_win_any_column' method."""
         # base board, with all zeros, should have None
         assert base_board.check_win_any_column() is None
-       
+
         # board with one column that wins for Player 2
         new_board = Board()
         new_board.init_board()
         connect_four_middle_of_column = np.array([1, 2, 2, 2, 2, 1, 1])
         new_board[:, 1] = connect_four_middle_of_column
         assert new_board.check_win_any_column() == 2
+
+    def test_define_diagonal_from_endpoint(self, base_board):
+        """Tests the '_define_diagonal_from_endpoint' method."""
+        directions = ["upperleft", "upperright", "lowerleft", "lowerright"]
+
+        # test 1: coordinate is in the top left corner. Only "lowerright"
+        # should give results.
+        list_of_possible_diagonals = [
+            base_board._define_diagonal_from_endpoint(
+                row_num=0, col_num=0, direction=direction
+            )
+            for direction in directions
+        ]
+
+        assert list_of_possible_diagonals[0] is None
+        assert list_of_possible_diagonals[1] is None
+        assert list_of_possible_diagonals[2] is None
+        assert np.array_equal(
+            list_of_possible_diagonals[3],
+            np.array([
+                np.array([0, 0]), np.array([1, 1]),
+                np.array([2, 2]), np.array([3, 3])
+            ])
+        )
+
+        # test 2: coordinate is in the middle of the top row. Only "lowerleft"
+        # should give results. Shifting col_num to 2 instead of 3 would mean
+        # only "lowerright" would give results.
+        list_of_possible_diagonals = [
+            base_board._define_diagonal_from_endpoint(
+                row_num=0, col_num=3, direction=direction
+            )
+            for direction in directions
+        ]
+        assert list_of_possible_diagonals[0] is None
+        assert list_of_possible_diagonals[1] is None
+        assert np.array_equal(
+            list_of_possible_diagonals[2],
+            np.array([
+                np.array([3, 0]), np.array([2, 1]),
+                np.array([1, 2]), np.array([0, 3])
+            ])
+        )
+        assert list_of_possible_diagonals[3] is None
+
+        # test 3: coordinate is in the top right corner. Only "lowerleft"
+        # should give results.
+        list_of_possible_diagonals = [
+            base_board._define_diagonal_from_endpoint(
+                row_num=0, col_num=5, direction=direction
+            )
+            for direction in directions
+        ]
+        assert list_of_possible_diagonals[0] is None
+        assert list_of_possible_diagonals[1] is None
+        assert np.array_equal(
+            list_of_possible_diagonals[2],
+            np.array([
+                np.array([3, 2]), np.array([2, 3]),
+                np.array([1, 4]), np.array([0, 5])
+            ])
+        )
+        assert list_of_possible_diagonals[3] is None
+
+        # test 4: coordinate is in the middle row of the last column. Both
+        # "upperleft" and "lowerleft" should give results.
+        list_of_possible_diagonals = [
+            base_board._define_diagonal_from_endpoint(
+                row_num=3, col_num=5, direction=direction
+            )
+            for direction in directions
+        ]
+        assert np.array_equal(
+            list_of_possible_diagonals[0],
+            np.array([
+                np.array([0, 2]), np.array([1, 3]),
+                np.array([2, 4]), np.array([3, 5])
+            ])
+        )
+        assert list_of_possible_diagonals[1] is None
+        assert np.array_equal(
+            list_of_possible_diagonals[2],
+            np.array([
+                np.array([6, 2]), np.array([5, 3]),
+                np.array([4, 4]), np.array([3, 5])
+            ])
+        )
+        assert list_of_possible_diagonals[3] is None
+
+        # test 5: coordinate is in the bottom right corner. Only "upperleft"
+        # should give results.
+        list_of_possible_diagonals = [
+            base_board._define_diagonal_from_endpoint(
+                row_num=6, col_num=5, direction=direction
+            )
+            for direction in directions
+        ]
+
+        assert np.array_equal(
+            list_of_possible_diagonals[0],
+            np.array([
+                np.array([3, 2]), np.array([4, 3]),
+                np.array([5, 4]), np.array([6, 5])
+            ])
+        )
+        assert list_of_possible_diagonals[1] is None
+        assert list_of_possible_diagonals[2] is None
+        assert list_of_possible_diagonals[3] is None
+
+        # test 6: coordinate is in the middle of the bottom row. Only
+        # "upperright" will give results. Shifting col_num from 2 to 3
+        # will mean that "upperleft" would give results.
+        list_of_possible_diagonals = [
+            base_board._define_diagonal_from_endpoint(
+                row_num=6, col_num=2, direction=direction
+            )
+            for direction in directions
+        ]
+
+        assert list_of_possible_diagonals[0] is None
+        assert np.array_equal(
+            list_of_possible_diagonals[1],
+            np.array([
+                np.array([6, 2]), np.array([5, 3]),
+                np.array([4, 4]), np.array([3, 5])
+            ])
+        )
+        assert list_of_possible_diagonals[2] is None
+        assert list_of_possible_diagonals[3] is None
+
+        # test 7: coordinate is in the bottom left corner. Only "upperright"
+        # should give results.
+        list_of_possible_diagonals = [
+            base_board._define_diagonal_from_endpoint(
+                row_num=6, col_num=0, direction=direction
+            )
+            for direction in directions
+        ]
+
+        assert list_of_possible_diagonals[0] is None
+        assert np.array_equal(
+            list_of_possible_diagonals[1],
+            np.array([
+                np.array([6, 0]), np.array([5, 1]),
+                np.array([4, 2]), np.array([3, 3])
+            ])
+        )
+        assert list_of_possible_diagonals[2] is None
+        assert list_of_possible_diagonals[3] is None
+
+        # test 8: coordinate is in the middle row of the first column. Both
+        # "upperright" and "lowerright" should give results.
+        list_of_possible_diagonals = [
+            base_board._define_diagonal_from_endpoint(
+                row_num=3, col_num=0, direction=direction
+            )
+            for direction in directions
+        ]
+        assert list_of_possible_diagonals[0] is None
+        assert np.array_equal(
+            list_of_possible_diagonals[1],
+            np.array([
+                np.array([3, 0]), np.array([2, 1]),
+                np.array([1, 2]), np.array([0, 3])
+            ])
+        )
+        assert list_of_possible_diagonals[2] is None
+        assert np.array_equal(
+            list_of_possible_diagonals[3],
+            np.array([
+                np.array([3, 0]), np.array([4, 1]),
+                np.array([5, 2]), np.array([6, 3])
+            ])
+        )
+        # test 9: coordinate is right in the middle of the board. In this
+        # example, only "lowerleft" and "upperleft" should give results.
+        list_of_possible_diagonals = [
+            base_board._define_diagonal_from_endpoint(
+                row_num=3, col_num=3, direction=direction
+            )
+            for direction in directions
+        ]
+        assert np.array_equal(
+            list_of_possible_diagonals[0],
+            np.array([
+                np.array([0, 0]), np.array([1, 1]),
+                np.array([2, 2]), np.array([3, 3])
+            ])
+        )
+        assert list_of_possible_diagonals[1] is None
+        assert np.array_equal(
+            list_of_possible_diagonals[2],
+            np.array([
+                np.array([6, 0]), np.array([5, 1]),
+                np.array([4, 2]), np.array([3, 3])
+            ])
+        )
+        assert list_of_possible_diagonals[3] is None
+
+    def test_define_all_possible_diagonals_from_point(self, base_board):
+        """Tests the '_define_all_possible_diagonals_from_point' method."""
+
+        # test 1: coordinate is in the top left corner. Should only be one
+        # possible diagonal.
+        list_diagonals = base_board._define_all_possible_diagonals_from_point(
+            row_num=0, col_num=0
+        )
+        assert len(list_diagonals) == 1
+        assert np.array_equal(
+            list_diagonals,
+            np.array([[
+                np.array([0, 0]),
+                np.array([1, 1]),
+                np.array([2, 2]),
+                np.array([3, 3]),
+            ]])
+        )
+
+        # test 2: coordinate is in the middle of the top row.
+        list_diagonals = base_board._define_all_possible_diagonals_from_point(
+            row_num=0, col_num=3
+        )
+        assert len(list_diagonals) == 1
+        assert np.array_equal(
+            list_diagonals,
+            np.array([[
+                np.array([3, 0]),
+                np.array([2, 1]),
+                np.array([1, 2]),
+                np.array([0, 3]),
+            ]])
+        )
+
+        # test 3: coordinate is in the top right corner.
+        list_diagonals = base_board._define_all_possible_diagonals_from_point(
+            row_num=0, col_num=5
+        )
+        assert len(list_diagonals) == 1
+        assert np.array_equal(
+            list_diagonals,
+            np.array([[
+                np.array([3, 2]),
+                np.array([2, 3]),
+                np.array([1, 4]),
+                np.array([0, 5]),
+            ]])
+        )
+
+        # test 4: coordinate is in the middle row of the last column.
+        list_diagonals = base_board._define_all_possible_diagonals_from_point(
+            row_num=3, col_num=5
+        )
+        assert len(list_diagonals) == 2
+        assert np.array_equal(
+            list_diagonals,
+            np.array([
+                [
+                    np.array([0, 2]),
+                    np.array([1, 3]),
+                    np.array([2, 4]),
+                    np.array([3, 5]),
+                ],
+                [
+                    np.array([6, 2]),
+                    np.array([5, 3]),
+                    np.array([4, 4]),
+                    np.array([3, 5]),
+                ]
+            ])
+        )
+
+        # test 5: coordinate is in the bottom right corner.
+        list_diagonals = base_board._define_all_possible_diagonals_from_point(
+            row_num=6, col_num=5
+        )
+        assert len(list_diagonals) == 1
+        assert np.array_equal(
+            list_diagonals,
+            np.array([[
+                np.array([3, 2]),
+                np.array([4, 3]),
+                np.array([5, 4]),
+                np.array([6, 5]),
+            ]])
+        )
+
+        # test 6: coordinate is in the middle of the bottom row.
+        list_diagonals = base_board._define_all_possible_diagonals_from_point(
+            row_num=6, col_num=2
+        )
+        assert len(list_diagonals) == 1
+        assert np.array_equal(
+            list_diagonals,
+            np.array([[
+                np.array([6, 2]),
+                np.array([5, 3]),
+                np.array([4, 4]),
+                np.array([3, 5]),
+            ]])
+        )
+
+        # test 7: coordinate is in the bottom left corner.
+        list_diagonals = base_board._define_all_possible_diagonals_from_point(
+            row_num=6, col_num=0
+        )
+        assert len(list_diagonals) == 1
+        assert np.array_equal(
+            list_diagonals,
+            np.array([[
+                np.array([6, 0]),
+                np.array([5, 1]),
+                np.array([4, 2]),
+                np.array([3, 3]),
+            ]])
+        )
+
+        # test 8: coordinate is in the middle row of the first column.
+        list_diagonals = base_board._define_all_possible_diagonals_from_point(
+            row_num=3, col_num=0
+        )
+        assert len(list_diagonals) == 2
+        assert np.array_equal(
+            list_diagonals,
+            np.array([
+                [
+                    np.array([3, 0]),
+                    np.array([2, 1]),
+                    np.array([1, 2]),
+                    np.array([0, 3]),
+                ],
+                [
+                    np.array([3, 0]),
+                    np.array([4, 1]),
+                    np.array([5, 2]),
+                    np.array([6, 3]),
+                ]
+            ])
+        )
+
+        # test 9: coordinate is right in the middle of the board.
+        list_diagonals = base_board._define_all_possible_diagonals_from_point(
+            row_num=3, col_num=3
+        )
+        assert len(list_diagonals) == 6
+        assert np.array_equal(
+            list_diagonals,
+            np.array([
+                [
+                    np.array([0, 0]),
+                    np.array([1, 1]),
+                    np.array([2, 2]),
+                    np.array([3, 3]),
+                ],
+                [
+                    np.array([1, 1]),
+                    np.array([2, 2]),
+                    np.array([3, 3]),
+                    np.array([4, 4]),
+                ],
+                [
+                    np.array([2, 2]),
+                    np.array([3, 3]),
+                    np.array([4, 4]),
+                    np.array([5, 5]),
+                ],
+                [
+                    np.array([4, 2]),
+                    np.array([3, 3]),
+                    np.array([2, 4]),
+                    np.array([1, 5]),
+                ],
+                [
+                    np.array([5, 1]),
+                    np.array([4, 2]),
+                    np.array([3, 3]),
+                    np.array([2, 4]),
+                ],
+                [
+                    np.array([6, 0]),
+                    np.array([5, 1]),
+                    np.array([4, 2]),
+                    np.array([3, 3]),
+                ],
+            ])
+        )
