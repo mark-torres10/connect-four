@@ -17,7 +17,7 @@ COLUMN_COUNT = 6
 NUM_IN_A_ROW_TO_WIN = 4
 
 SQUARESIZE = 100
-GAME_WIDTH = (COLUMN_COUNT + 2) * SQUARESIZE
+GAME_WIDTH = (COLUMN_COUNT + 3) * SQUARESIZE
 GAME_HEIGHT = (ROW_COUNT + 3) * SQUARESIZE
 
 GAME_SIZE = (GAME_WIDTH, GAME_HEIGHT)
@@ -29,4 +29,9 @@ COLOR_TO_CODE_DICT = {
     "black": (0, 0, 0),
     "red": (255, 0, 0),
     "yellow": (255, 255, 0)
+}
+
+VALUE_TO_COLOR_DICT = {
+    1: "red",
+    2: "yellow"
 }

@@ -3,7 +3,7 @@ from typing import Literal, Tuple
 
 import numpy as np
 
-import scripts.constants as constants
+import constants
 
 
 class Piece:
