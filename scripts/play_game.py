@@ -30,9 +30,6 @@ GAME_OVER_BOOL = False
 
 IS_PLAYER_1_TURN = True
 
-# 20 second wait interval after finishing game.
-TIME_TO_WAIT = 20000
-
 
 def play_game():
     """Main function to play game."""
