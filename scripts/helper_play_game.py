@@ -1,5 +1,8 @@
 """Helper file for gameplay. Manages functions such as setting up the board
 using pygame."""
+import copy
+
+import numpy as np
 import pygame
 
 import constants as constants
@@ -13,6 +16,14 @@ def init_game():
 
 def draw_board(board: Board, screen: pygame.Surface):
     """Draws and displays board of current game state using pygame."""
+
+    # flip board to correctly display pieces (upside down)
+    # TODO(mark): find cleaner implementation. We want the display to go
+    # from bottom to top, but board implementation is easiest from top to
+    # bottom (since 0th row is first row). As temporary workaround, currently
+    # just flipping the board.
+    new_board = copy.deepcopy(board)
+    new_board.board = np.flip(new_board.board, axis=0)
 
     # draw Connect Four slots
     for col_num in range(constants.COLUMN_COUNT):
@@ -47,7 +58,7 @@ def draw_board(board: Board, screen: pygame.Surface):
     for col_num in range(constants.COLUMN_COUNT):
         for row_num in range(constants.ROW_COUNT):
             # draw Player 1's pieces:
-            if board[row_num, col_num] == 1:
+            if new_board[row_num, col_num] == 1:
                 pygame.draw.circle(
                     screen,
                     constants.COLOR_TO_CODE_DICT[
@@ -66,7 +77,7 @@ def draw_board(board: Board, screen: pygame.Surface):
                     constants.SLOT_RADIUS
                 )
             # draw Player 2's pieces:
-            elif board[row_num, col_num] == 2:
+            elif new_board[row_num, col_num] == 2:
                 pygame.draw.circle(
                     screen,
                     constants.COLOR_TO_CODE_DICT[

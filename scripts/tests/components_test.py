@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from scripts.constants import COLUMN_COUNT, ROW_COUNT
-from scripts.components import Board, Piece
+from scripts.components import Board
 
 
 @pytest.fixture
@@ -13,16 +13,6 @@ def base_board(scope="function"):
     board = Board(num_rows=ROW_COUNT, num_columns=COLUMN_COUNT)
     board.init_board()
     return board
-
-
-class TestPiece:
-    """Tests the 'Piece' class."""
-
-    def test_init_piece(self):
-        """Tests init of piece."""
-        piece = Piece("red", 1)
-        assert piece.color == "red"
-        assert piece.value == 1
 
 
 class TestBoard:
@@ -37,9 +27,23 @@ class TestBoard:
         assert board.board.shape == (self.num_rows, self.num_columns)
         assert not np.any(board.board)  # test for all zeros
 
-    def test_drop_piece(self):
+    def test_drop_piece(self, base_board):
         """Tests the 'drop_piece' method."""
-        pass
+        # test 1: verify that board state isn't updated when trying to move
+        # a piece onto an space not on the board. Board should still have
+        # all zeros.
+        base_board.drop_piece(col_num=100, value=1)
+        assert not np.any(base_board.board)
+
+        # test 2: verify that board state isn't updated when a column is full.
+        base_board[:, 0] = 1
+        base_board.drop_piece(col_num=0, value=2)
+        assert 2 not in base_board[:, 0]
+
+        # test 3: verify that board state is properly updated when dropping
+        # a piece into a valid column
+        base_board.drop_piece(col_num=3, value=2)
+        assert base_board[0, 3] == 2
 
     def test_check_is_move_on_board(self, base_board):
         """Tests the 'check_is_move_on_board' method."""

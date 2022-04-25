@@ -6,18 +6,6 @@ import numpy as np
 import constants
 
 
-class Piece:
-    """Used to define the pieces that each player uses.
-
-    Each player will use a separate instance, initialized with a color
-    and a value mapped to their piece (either a 1 or 2, depending on if they
-    are Player 1 or Player 2).
-    """
-    def __init__(self, color: str, value: Literal[1, 2]):
-        self.color = color
-        self.value = value
-
-
 class Board:
     """Used to define the board that the players are playing on."""
 
@@ -88,22 +76,27 @@ class Board:
         self.board = np.zeros((self.num_rows, self.num_columns))
 
     # TODO(mark): add test + refactor
-    def drop_piece(self, col_num: int, piece: Piece):
+    def drop_piece(self, col_num: int, value: Literal[1, 2]):
         """Drops a piece onto the board.
 
         Players can only choose the column that they drop a piece into, so we
         limit the input to only be column + the piece that the player uses.
+
+        Returns:
+            (boolean): whether or not the drop was successful.
         """
-        if not self.is_valid_move(col_num=col_num):
+        if col_num < 0 or col_num > self.num_columns - 1:
             print("A piece can't be moved there.")
-            return
+            return False
 
         next_valid_row_num = self.get_next_valid_row_in_column(col_num)
-        if not next_valid_row_num:
+        if next_valid_row_num is None:
             print("A piece can't be moved there.")
-            return
+            return False
 
-        self.board[[next_valid_row_num, col_num]] = piece.value
+        self.board[next_valid_row_num, col_num] = value
+
+        return True
 
     def check_is_move_on_board(self, row_num: int, col_num: int):
         """Given a row_num, col_num pair, check if the move is on the board.
@@ -739,7 +732,7 @@ class Board:
         """Checks to see if the game is over.
 
         Returns:
-            has_winner (bool): is the game over?
+            is_game_over (bool): is the game over?
             winner (int): corresponds to Player 1 or Player 2, depending on
             the winner.
         """

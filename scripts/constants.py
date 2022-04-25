@@ -27,6 +27,7 @@ SLOT_RADIUS = int(SQUARESIZE / 2 - 8)
 COLOR_TO_CODE_DICT = {
     "blue": (0, 0, 255),
     "black": (0, 0, 0),
+    "white": (255, 255, 255),
     "red": (255, 0, 0),
     "yellow": (255, 255, 0)
 }
