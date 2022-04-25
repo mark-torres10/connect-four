@@ -15,3 +15,18 @@
 ROW_COUNT = 7
 COLUMN_COUNT = 6
 NUM_IN_A_ROW_TO_WIN = 4
+
+SQUARESIZE = 100
+GAME_WIDTH = (COLUMN_COUNT + 2) * SQUARESIZE
+GAME_HEIGHT = (ROW_COUNT + 3) * SQUARESIZE
+
+GAME_SIZE = (GAME_WIDTH, GAME_HEIGHT)
+
+SLOT_RADIUS = int(SQUARESIZE / 2 - 8)
+
+COLOR_TO_CODE_DICT = {
+    "blue": (0, 0, 255),
+    "black": (0, 0, 0),
+    "red": (255, 0, 0),
+    "yellow": (255, 255, 0)
+}

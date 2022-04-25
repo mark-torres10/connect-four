@@ -161,6 +161,18 @@ class Board:
 
         return row_num
 
+    def get_dict_next_valid_moves(self):
+        """Get a dict of the next possible valid moves, keyed on the column.
+
+        Returns:
+            dict_column_to_next_valid_row (Dict)
+        """
+        dict_column_to_next_valid_row = {
+            col_num: self.get_next_valid_row_in_column(col_num)
+            for col_num in range(self.num_columns)
+        }
+        return dict_column_to_next_valid_row
+
     def check_if_any_valid_moves(self):
         """Checks if any valid moves can still be made on the board.
 
