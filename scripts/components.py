@@ -173,7 +173,11 @@ class Board:
         """
         return 0 in self.board
 
-    def check_win_connected_in_a_row(self, row_num: int):
+    def check_win_connected_in_a_row(
+        self,
+        row_num: int,
+        num_in_a_row: int = constants.NUM_IN_A_ROW_TO_WIN
+    ):
         """Checks if there are the required amounts of tokens in a row in
         a given row in order to win.
 
@@ -204,8 +208,7 @@ class Board:
                 # if 4 values are in a row (and they're not 0),
                 # return the value
                 if (
-                    val_to_player_counter_dict[val]
-                    == constants.NUM_IN_A_ROW_TO_WIN
+                    val_to_player_counter_dict[val] == num_in_a_row
                     and val != 0.0
                 ):
                     return val
@@ -221,7 +224,10 @@ class Board:
         # no matches -> return None
         return None
 
-    def check_win_any_row(self):
+    def check_win_any_row(
+        self,
+        num_in_a_row: int = constants.NUM_IN_A_ROW_TO_WIN
+    ):
         """Check if there's the required connected tokens in any row to win.
 
         Returns:
@@ -229,7 +235,9 @@ class Board:
             depending on the winner (if any). If no winner, return None
         """
         row_winners = [
-            self.check_win_connected_in_a_row(row_num)
+            self.check_win_connected_in_a_row(
+                row_num, num_in_a_row=num_in_a_row
+            )
             for row_num in range(self.num_rows)
         ]
 
@@ -243,7 +251,11 @@ class Board:
         else:
             return None
 
-    def check_win_connected_in_a_column(self, col_num: int):
+    def check_win_connected_in_a_column(
+        self,
+        col_num: int,
+        num_in_a_row: int = constants.NUM_IN_A_ROW_TO_WIN
+    ):
         """Checks if there are the required amounts of tokens in a row in
         a given column in order to win.
 
@@ -274,8 +286,7 @@ class Board:
                 # if 4 values are in a column (and they're not 0),
                 # return the value
                 if (
-                    val_to_player_counter_dict[val]
-                    == constants.NUM_IN_A_ROW_TO_WIN
+                    val_to_player_counter_dict[val] == num_in_a_row
                     and val != 0.0
                 ):
                     return val
@@ -291,7 +302,9 @@ class Board:
         # no matches -> return None
         return None
 
-    def check_win_any_column(self):
+    def check_win_any_column(
+        self, num_in_a_row: int = constants.NUM_IN_A_ROW_TO_WIN
+    ):
         """Check if there's the required connected tokens in any column
         to win.
 
@@ -300,7 +313,9 @@ class Board:
             depending on the winner (if any). If no winner, return None
         """
         column_winners = [
-            self.check_win_connected_in_a_column(col_num)
+            self.check_win_connected_in_a_column(
+                col_num, num_in_a_row=num_in_a_row
+            )
             for col_num in range(self.num_columns)
         ]
 
@@ -673,7 +688,10 @@ class Board:
 
         return dict_point_to_diagonals
 
-    def check_win_connected_in_a_diagonal(self, row_num: int, col_num: int):
+    def check_win_connected_in_a_diagonal(
+        self, row_num: int, col_num: int,
+        num_in_a_row: int = constants.NUM_IN_A_ROW_TO_WIN
+    ):
         """Checks if there are the required amounts of tokens in a row in a
         any given diagonal from a certain starting point in order to win.
 
@@ -689,7 +707,7 @@ class Board:
         list_of_diagonals = self.all_possible_diagonals[(row_num, col_num)]
 
         winner = None
-        num_in_a_row = 0
+        num_vals_in_a_row = 0
 
         # see if there's four in a row in any of the diagonals.
         for diagonal in list_of_diagonals:
@@ -697,23 +715,25 @@ class Board:
                 value_at_point = self.board[row_num, col_num]
                 if winner is None:
                     winner = value_at_point
-                    num_in_a_row += 1
+                    num_vals_in_a_row += 1
                 elif value_at_point == winner:
-                    num_in_a_row += 1
+                    num_vals_in_a_row += 1
                 else:
-                    num_in_a_row = 0
+                    num_vals_in_a_row = 0
                     winner = value_at_point
             # if four in a row isn't found, reset and continue.
             # else, return the winning value.
-            if num_in_a_row == 4 and winner != 0:
+            if num_vals_in_a_row == num_in_a_row and winner != 0:
                 return winner
             else:
                 winner = None
-                num_in_a_row = 0
+                num_vals_in_a_row = 0
 
         return None
 
-    def check_win_any_diagonal(self):
+    def check_win_any_diagonal(
+        self, num_in_a_row: int = constants.NUM_IN_A_ROW_TO_WIN
+    ):
         """Check if there's the required connected tokens in any diagonal
         anywhere on the board to win.
 
@@ -722,11 +742,50 @@ class Board:
             depending on the winner (if any). If no winner, return None
         """
         for (row_num, col_num) in self.all_possible_diagonals.keys():
-            winner = self.check_win_connected_in_a_diagonal(row_num, col_num)
+            winner = self.check_win_connected_in_a_diagonal(
+                row_num, col_num, num_in_a_row=num_in_a_row
+            )
             if winner is not None:
                 return winner
 
         return None
+
+    def get_max_num_in_a_row_dict(self):
+        """Given a certain game state, get the maximum number of pieces in a row
+        as well as which player has that."""
+        num_in_a_row_to_player_dict = {}
+
+        for num_in_a_row in range(constants.NUM_IN_A_ROW_TO_WIN):
+            row_winner = self.check_win_any_row(num_in_a_row=num_in_a_row)
+            column_winner = self.check_win_any_column(
+                num_in_a_row=num_in_a_row
+            )
+            diagonal_winner = self.check_win_any_diagonal(
+                num_in_a_row=num_in_a_row
+            )
+
+            has_winner = any([row_winner, column_winner, diagonal_winner])
+
+            if has_winner:
+                set_winners = set(
+                    elem for elem in
+                    [row_winner, column_winner, diagonal_winner]
+                    if elem is not None
+                )
+                num_in_a_row_to_player_dict[num_in_a_row] = list(set_winners)
+
+        max_num_in_a_row = -1
+
+        for key, list_vals in num_in_a_row_to_player_dict:
+            if len(list_vals) > 0 and key > max_num_in_a_row:
+                max_num_in_a_row = key
+
+        if max_num_in_a_row == -1:
+            return {}
+        else:
+            return {
+                max_num_in_a_row: num_in_a_row_to_player_dict[max_num_in_a_row]
+            }
 
     def is_game_over(self):
         """Checks to see if the game is over.

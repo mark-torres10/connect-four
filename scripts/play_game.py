@@ -4,9 +4,6 @@ import sys
 
 import pygame
 
-# TODO(mark): when board is displayed, it needs to be flipped.
-# we can represent the coordinates correctly in a matrix, but the
-# board will be drawn upside down unless it's flipped.
 from components import Board
 from constants import (
     COLOR_TO_CODE_DICT,
@@ -18,7 +15,7 @@ from constants import (
     VALUE_TO_COLOR_DICT
 )
 from helper_play_game import (
-    draw_board, init_game
+    computer_make_move, draw_board, init_game
 )
 
 pygame.init()
@@ -48,6 +45,19 @@ def play_game():
 
             if event.type == pygame.QUIT:
                 sys.exit()
+
+            # computer makes move if it is its turn
+            # NOTE(mark): assumes that user is Player 1.
+            # TODO(mark): need to update the opponent function used, and to do
+            # so as param.
+            if not IS_PLAYER_1_TURN:
+                computer_make_move(
+                    board=board,
+                    difficulty_level="easy"
+                )
+                draw_board(board=board, screen=screen)
+                IS_PLAYER_1_TURN = not IS_PLAYER_1_TURN
+                continue
 
             # render piece while user is hovering on screen.
             if event.type == pygame.MOUSEMOTION:

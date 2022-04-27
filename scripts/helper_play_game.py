@@ -1,12 +1,22 @@
 """Helper file for gameplay. Manages functions such as setting up the board
 using pygame."""
 import copy
+from typing import Literal
 
 import numpy as np
 import pygame
 
+from algos import (
+    make_move_alpha_beta_pruning, make_move_deep_q_learning, make_move_naive
+)
 import constants as constants
 from components import Board
+
+COMPUTER_OPPONENT_TO_ALGO = {
+    "easy": make_move_naive,
+    "medium": make_move_alpha_beta_pruning,
+    "hard": make_move_deep_q_learning
+}
 
 
 def init_game():
@@ -98,3 +108,15 @@ def draw_board(board: Board, screen: pygame.Surface):
 
     # update display
     pygame.display.update()
+
+
+def computer_make_move(
+    board: Board, difficulty_level: Literal["easy", "medium", "hard"]
+):
+    """Computer opponent makes a move.
+
+    Wrapper function around the actual function that makes the move and updates
+    the board.
+    """
+    func = COMPUTER_OPPONENT_TO_ALGO[difficulty_level]
+    func(board)
